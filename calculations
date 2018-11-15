@@ -1,0 +1,119 @@
+OS Curves
+single sheet 
+###################
+CT Parameter
+String
+  CNS/Brain
+  Colorectal
+  head and Neck
+  Lung
+
+CT Calculation
+CASE [Parameters].[Cancer Type]
+WHEN "Colorectal" THEN [Cancer Type]
+WHEN "Head and Neck" THEN [Cancer Type]
+WHEN "Lung" THEN [Cancer Type]
+WHEN "CNS/Brain" THEN [Cancer Type]
+ELSE " " 
+END
+
+  Use all, condition formula, [CT Calculation]=[Parameters].[Cancer Type]
+  
+Censors
+IF SUM([Censor Line]) = 0 THEN [Line (copy)] END
+
+d
+SUM([Censor Line])
+
+Histology List
+ATTR([Histology]) + " " + STR(SUM([Number of Patients])) + '|' + PREVIOUS_VALUE('')
+Histology List Filter
+INDEX() <> SIZE()
+
+Line
+PREVIOUS_VALUE(1)* 
+((
+[n]-[d])/([n]))
+
+Line(copy)
+IFNULL([Line], PREVIOUS_VALUE(1))
+
+n
+TOTAL(SUM([Number of Patients]))-(RUNNING_SUM(SUM([Censor Line]+[Censor tick marks])))
+
+N
+(TOTAL(SUM([Number of Patients])))-RUNNING_SUM(SUM([Number of Patients]))
+#############
+
+Swimmer Plot 
+Joined sheet
+#############
+CRC TF Filter
+[Parameters].[Cancer Type]="Colorectal"
+#false pushes filter below image in container
+
+CT Calculation
+CASE [Parameters].[Cancer Type]
+WHEN "Colorectal" THEN [Cancer Type]
+WHEN "Head and Neck" THEN [Cancer Type]
+WHEN "Lung" THEN [Cancer Type]
+WHEN "CNS/Brain" THEN [Cancer Type]
+ELSE " " 
+END
+
+NSCLC TF Filter
+[Parameters].[Cancer Type]="Lung"
+#false pushes filter below image in container
+
+Patient #
+"Patient " + STR([Index])
+
+############
+Tabs
+
+Tab-BTI
+0
+Tab-OS
+0
+Tab-SP
+0
+Tab-Tree
+0
+
+Biomarker Result List
+ATTR([Biomarker Result]) + '|' + PREVIOUS_VALUE('')
+
+Biomarker Result List Filter
+INDEX() <> SIZE()
+
+COUNTD Patient
+COUNTD([Patient])
+
+Month Death
+IFNULL({FIXED [Patient]:AVG([Day of Death])/30},null)
+
+Month Difference
+[Tx End Month No Null] - [Tx Start Month]
+
+Month Last Contact
+IFNULL({FIXED [Patient]:AVG([Day of Last Contact])/30},null)
+
+Month Mdx
+IFNULL({FIXED [Patient]:AVG([Report Date])/30},null)
+
+Tx End Month
+[Derived Treatment End]/30
+
+Tx end month no null
+IF ISNULL([Tx End Month]) THEN ([Month Death]) 
+ELSEIF ISNULL([Tx End Month]) THEN[Month Last Contact]
+ELSE [Tx End Month]
+END
+
+Tx Start Month
+[Start Date]/30
+
+
+
+
+
